@@ -954,10 +954,10 @@ class RawConfigParser(MutableMapping):
             del self._proxies[section]
         return existed
 
-    def __getitem__(self, key):
-        if key != self.default_section and not self.has_section(key):
-            raise KeyError(key)
-        return self._proxies[key]
+    #def __getitem__(self, key):
+        #if key != self.default_section and not self.has_section(key):
+            #raise KeyError(key)
+        #return self._proxies[key]
 
     def __setitem__(self, key, value):
         # To conform with the mapping protocol, overwrites existing values in
@@ -971,11 +971,11 @@ class RawConfigParser(MutableMapping):
             self._sections[key].clear()
         self.read_dict({key: value})
 
-    def __delitem__(self, key):
-        if key == self.default_section:
-            raise ValueError("Cannot remove the default section.")
-        if not self.has_section(key):
-            raise KeyError(key)
+    #def __delitem__(self, key):
+        #if key == self.default_section:
+            #raise ValueError("Cannot remove the default section.")
+        #if not self.has_section(key):
+            #raise KeyError(key)
         self.remove_section(key)
 
     def __contains__(self, key):
@@ -1230,17 +1230,17 @@ class SectionProxy(MutableMapping):
 
     def __getitem__(self, key):
         if not self._parser.has_option(self._name, key):
-            raise KeyError(key)
+            #raise KeyError(key)
         return self._parser.get(self._name, key)
 
     def __setitem__(self, key, value):
         self._parser._validate_value_types(option=key, value=value)
         return self._parser.set(self._name, key, value)
 
-    def __delitem__(self, key):
-        if not (self._parser.has_option(self._name, key) and
-                self._parser.remove_option(self._name, key)):
-            raise KeyError(key)
+    #def __delitem__(self, key):
+        #if not (self._parser.has_option(self._name, key) and
+                #self._parser.remove_option(self._name, key)):
+            #raise KeyError(key)
 
     def __contains__(self, key):
         return self._parser.has_option(self._name, key)
@@ -1321,11 +1321,11 @@ class ConverterMapping(MutableMapping):
             getter = functools.partial(proxy.get, _impl=func)
             setattr(proxy, k, getter)
 
-    def __delitem__(self, key):
-        try:
+    #def __delitem__(self, key):
+        #try:
             k = 'get' + (key or None)
-        except TypeError:
-            raise KeyError(key)
+        #except TypeError:
+            #raise KeyError(key)
         del self._data[key]
         for inst in itertools.chain((self._parser,), self._parser.values()):
             try:
