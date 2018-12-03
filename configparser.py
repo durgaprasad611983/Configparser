@@ -959,12 +959,12 @@ class RawConfigParser(MutableMapping):
             return self._proxies[key]
 
     def __setitem__(self, key, value):
+        
+        #To conform with the mapping protocol, overwrites existing values in
+        #the section.
 
-        To conform with the mapping protocol, overwrites existing values in
-        the section.
-
-        XXX this is not atomic if read_dict fails at any point. Then again,
-        no update method in configparser is atomic in this implementation.
+        #XXX this is not atomic if read_dict fails at any point. Then again,
+        #no update method in configparser is atomic in this implementation.
         if key == self.default_section:
             self._defaults.clear()
         elif key in self._sections:
@@ -982,7 +982,7 @@ class RawConfigParser(MutableMapping):
         return len(self._sections) + 1 # the default section
 
     def __iter__(self):
-        XXX does it break when underlying container state changed?
+        #XXX does it break when underlying container state changed?
         return itertools.chain((self.default_section,), self._sections.keys())
 
     def _read(self, fp, fpname):
