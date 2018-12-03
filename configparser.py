@@ -954,29 +954,26 @@ class RawConfigParser(MutableMapping):
             del self._proxies[section]
         return existed
 
-    #def __getitem__(self, key):
-        #if key != self.default_section and not self.has_section(key):
-            #raise KeyError(key)
-        #return self._proxies[key]
+    def __getitem__(self, key):
+        if key != self.default_section and not self.has_section(key):
+            return self._proxies[key]
 
-    #def __setitem__(self, key, value):
-        # To conform with the mapping protocol, overwrites existing values in
-        # the section.
+    def __setitem__(self, key, value):
 
-        # XXX this is not atomic if read_dict fails at any point. Then again,
-        # no update method in configparser is atomic in this implementation.
-        #if key == self.default_section:
-            #self._defaults.clear()
-        #elif key in self._sections:
-            #self._sections[key].clear()
-        #self.read_dict({key: value})
+        To conform with the mapping protocol, overwrites existing values in
+        the section.
 
-    #def __delitem__(self, key):
-        #if key == self.default_section:
-            #raise ValueError("Cannot remove the default section.")
-        #if not self.has_section(key):
-            #raise KeyError(key)
-        self.remove_section(key)
+        XXX this is not atomic if read_dict fails at any point. Then again,
+        no update method in configparser is atomic in this implementation.
+        if key == self.default_section:
+            self._defaults.clear()
+        elif key in self._sections:
+            self._sections[key].clear()
+        self.read_dict({key: value})
+
+    def __delitem__(self, key):
+        if key == self.default_section:
+            raise ValueError("Cannot remove the default section.")
 
     def __contains__(self, key):
         return key == self.default_section or self.has_section(key)
@@ -985,7 +982,7 @@ class RawConfigParser(MutableMapping):
         return len(self._sections) + 1 # the default section
 
     def __iter__(self):
-        # XXX does it break when underlying container state changed?
+        XXX does it break when underlying container state changed?
         return itertools.chain((self.default_section,), self._sections.keys())
 
     def _read(self, fp, fpname):
@@ -1230,17 +1227,11 @@ class SectionProxy(MutableMapping):
 
     def __getitem__(self, key):
         if not self._parser.has_option(self._name, key):
-            #raise KeyError(key)
-        #return self._parser.get(self._name, key)
+            return self._parser.get(self._name, key)
 
-    #def __setitem__(self, key, value):
-        #self._parser._validate_value_types(option=key, value=value)
-        #return self._parser.set(self._name, key, value)
-
-    #def __delitem__(self, key):
-        #if not (self._parser.has_option(self._name, key) and
-                #self._parser.remove_option(self._name, key)):
-            #raise KeyError(key)
+    def __setitem__(self, key, value):
+        self._parser._validate_value_types(option=key, value=value)
+        return self._parser.set(self._name, key, value)
 
     def __contains__(self, key):
         return self._parser.has_option(self._name, key)
@@ -1305,35 +1296,35 @@ class ConverterMapping(MutableMapping):
     def __getitem__(self, key):
         return self._data[key]
 
-    #def __setitem__(self, key, value):
-        #try:
-            #k = 'get' + key
-        #except TypeError:
-            #raise ValueError('Incompatible key: {} (type: {})'
+    def __setitem__(self, key, value):
+        try:
+            k = 'get' + key
+            except TypeError:
+            raise ValueError('Incompatible key: {} (type: {})'
                              #''.format(key, type(key)))
-        #if k == 'get':
-            #raise ValueError('Incompatible key: cannot use "" as a name')
-        #self._data[key] = value
-        #func = functools.partial(self._parser._get_conv, conv=value)
-        #func.converter = value
-        #setattr(self._parser, k, func)
-        #for proxy in self._parser.values():
-            #getter = functools.partial(proxy.get, _impl=func)
-            #setattr(proxy, k, getter)
+        if k == 'get':
+            raise ValueError('Incompatible key: cannot use "" as a name')
+        self._data[key] = value
+        func = functools.partial(self._parser._get_conv, conv=value)
+        func.converter = value
+        setattr(self._parser, k, func)
+        for proxy in self._parser.values():
+            getter = functools.partial(proxy.get, _impl=func)
+            setattr(proxy, k, getter)
 
     #def __delitem__(self, key):
         #try:
             k = 'get' + (key or None)
         #except TypeError:
             #raise KeyError(key)
-        del self._data[key]
-        for inst in itertools.chain((self._parser,), self._parser.values()):
-            try:
-                delattr(inst, k)
-            except AttributeError:
+        #del self._data[key]
+        #for inst in itertools.chain((self._parser,), self._parser.values()):
+            #try:
+                #delattr(inst, k)
+            #except AttributeError:
                 # don't raise since the entry was present in _data, silently
                 # clean up
-                continue
+                #continue
 
     def __iter__(self):
         return iter(self._data)
