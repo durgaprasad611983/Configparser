@@ -1231,7 +1231,7 @@ class SectionProxy(MutableMapping):
     def __getitem__(self, key):
         if not self._parser.has_option(self._name, key):
             #raise KeyError(key)
-        return self._parser.get(self._name, key)
+        #return self._parser.get(self._name, key)
 
     def __setitem__(self, key, value):
         self._parser._validate_value_types(option=key, value=value)
