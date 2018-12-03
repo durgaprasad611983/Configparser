@@ -607,7 +607,7 @@ class RawConfigParser(MutableMapping):
         self._dict = dict_type
         self._sections = self._dict()
         self._defaults = self._dict()
-        self._converters = ConverterMapping(self)
+        #self._converters = ConverterMapping(self)
         self._proxies = self._dict()
         self._proxies[default_section] = SectionProxy(self, default_section)
         if defaults:
