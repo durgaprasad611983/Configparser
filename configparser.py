@@ -1297,10 +1297,10 @@ class ConverterMapping(MutableMapping):
         return self._data[key]
 
     def __setitem__(self, key, value):
-        try:
-            k = 'get' + key
-            except TypeError:
-            raise ValueError('Incompatible key: {} (type: {})'
+        #try:
+            #k = 'get' + key
+            #except TypeError:
+            #raise ValueError('Incompatible key: {} (type: {})'
                              #''.format(key, type(key)))
         if k == 'get':
             raise ValueError('Incompatible key: cannot use "" as a name')
